@@ -1,0 +1,29 @@
+services:
+  web:
+    build: ./hello_flask
+    deploy:
+      replicas: 3
+    expose:
+      - "5000"
+    depends_on:
+      - myredis
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+
+  myredis:
+    build: ./Redis
+    volumes:
+      - redis-data:/data
+  
+  nginx:
+    image: nginx:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+
+volumes:
+  redis-data:
